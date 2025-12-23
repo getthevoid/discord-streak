@@ -12,6 +12,7 @@ Discord tracks activity streaks - consecutive days of messaging in servers. This
 - Joins voice channel to maintain activity
 - Configurable status (online, idle, dnd)
 - Auto-reconnect on connection drops
+- Built-in health server for free hosting
 - Lightweight and minimal dependencies
 
 ## Setup
@@ -46,7 +47,17 @@ Discord tracks activity streaks - consecutive days of messaging in servers. This
 
 ## Deployment
 
-### Railway (Recommended)
+### Render (Free)
+
+1. Create a new **Web Service** on [Render](https://render.com)
+2. Connect your GitHub repository
+3. Set build command: `pip install uv && uv sync --frozen --no-dev`
+4. Set start command: `uv run python -m src`
+5. Add environment variables
+6. Deploy
+7. Set up [UptimeRobot](https://uptimerobot.com) to ping your Render URL every 5 minutes
+
+### Railway
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/template/getthevoid/discord-streak)
 
