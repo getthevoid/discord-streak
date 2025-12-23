@@ -1,105 +1,47 @@
 # discord-streak
 
-Keep your Discord activity streak alive by maintaining online presence.
+[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Railway](https://img.shields.io/badge/Railway-Deploy-blueviolet.svg)](https://railway.com/template/getthevoid/discord-streak)
 
-## What is this?
+Keep your Discord activity streak alive 24/7.
 
-Discord tracks activity streaks - consecutive days of messaging in servers. This tool keeps your Discord account online 24/7 to help maintain your activity streak and show your presence to friends.
+## Quick Start
+
+```bash
+# Clone and setup
+git clone https://github.com/getthevoid/discord-streak.git
+cd discord-streak
+cp .env.example .env
+
+# Configure .env with your token and servers
+# DISCORD_TOKEN=your_token
+# DISCORD_SERVERS=guild_id:channel_id
+
+# Run
+make dev
+```
 
 ## Features
 
-- Maintains online status via Discord Gateway
-- Joins multiple voice channels across servers
-- Configurable status (online, idle, dnd)
-- Auto-reconnect on connection drops
-- Built-in health server for free hosting
-- Lightweight and minimal dependencies
-
-## Setup
-
-1. Clone the repository
-2. Install dependencies:
-
-   ```bash
-   uv sync
-   ```
-
-3. Copy `.env.example` to `.env` and add your Discord token:
-
-   ```bash
-   cp .env.example .env
-   ```
-
-4. Run:
-
-   ```bash
-   make dev
-   ```
+- **24/7 Online Presence** — Maintains your Discord status around the clock
+- **Multi-Server Support** — Join voice channels across multiple servers
+- **Auto-Reconnect** — Handles disconnects with exponential backoff
+- **Configurable Status** — Choose between online, idle, or dnd
+- **Free Hosting Ready** — Built-in health server for Render/Railway
 
 ## Configuration
 
-| Variable          | Description                                      | Default  |
-| ----------------- | ------------------------------------------------ | -------- |
-| `DISCORD_TOKEN`   | Your Discord user token                          | Required |
-| `DISCORD_STATUS`  | Status to display (online, idle, dnd)            | `online` |
-| `DISCORD_SERVERS` | Servers to join (guild_id:channel_id, comma-sep) | Required |
+| Variable          | Description                                   | Default  |
+| ----------------- | --------------------------------------------- | -------- |
+| `DISCORD_TOKEN`   | Your Discord user token                       | Required |
+| `DISCORD_STATUS`  | Status: `online`, `idle`, `dnd`               | `online` |
+| `DISCORD_SERVERS` | `guild_id:channel_id` pairs (comma-separated) | Required |
 
-**Example:**
+## Documentation
 
-```env
-DISCORD_SERVERS=123456789:987654321,111111111:222222222
-```
-
-## Deployment
-
-### Render (Free)
-
-1. Create a new **Web Service** on [Render](https://render.com)
-2. Connect your GitHub repository
-3. Set build command: `uv sync --frozen && uv cache prune --ci`
-4. Set start command: `uv run python -m src`
-5. Add environment variables
-6. Deploy
-7. Set up [UptimeRobot](https://uptimerobot.com) to ping your Render URL every 5 minutes
-
-### Railway
-
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/template/getthevoid/discord-streak)
-
-1. Click the button above or create a new project on [Railway](https://railway.app)
-2. Connect your GitHub repository
-3. Add environment variables in Railway dashboard
-4. Deploy
-
-### Docker
-
-Run 24/7 with Docker:
-
-```bash
-# Copy and configure .env
-cp .env.example .env
-
-# Start container
-docker compose up -d
-
-# View logs
-docker compose logs -f
-
-# Stop container
-docker compose down
-```
-
-## Development
-
-```bash
-make install    # Install dependencies
-make dev        # Run the application
-make format     # Format code with ruff
-make lint       # Lint code with ruff
-make typecheck  # Type check with pyright
-make check      # Run all checks
-make clean      # Remove cache files
-```
+- [Deployment Guide](docs/deployment.md) — Deploy to Render, Railway, or Docker
+- [Development Guide](docs/development.md) — Local setup and contributing
 
 ## Metadata
 
@@ -116,4 +58,4 @@ __metadata__ = {
 
 ## Disclaimer
 
-This tool uses a user token which is against Discord's Terms of Service. Use at your own risk.
+> This tool uses a user token which is against Discord's Terms of Service. Use at your own risk.
