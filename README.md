@@ -25,8 +25,8 @@ make dev
 ## Features
 
 - **24/7 Online Presence** — Maintains your Discord status around the clock
-- **Multi-Server Support** — Join voice channels across multiple servers
-- **Auto-Reconnect** — Handles disconnects with exponential backoff
+- **Multi-Server Support** — Join voice channels across up to 15 servers simultaneously
+- **Auto-Reconnect** — Handles disconnects with exponential backoff (1s → 60s max)
 - **Configurable Status** — Choose between online, idle, or dnd
 - **Free Hosting Ready** — Built-in health server for Render/Railway
 

@@ -50,11 +50,11 @@ docker compose down
 
 All deployment methods require these environment variables:
 
-| Variable          | Description                                 | Required               |
-| ----------------- | ------------------------------------------- | ---------------------- |
-| `DISCORD_TOKEN`   | Your Discord user token                     | Yes                    |
-| `DISCORD_STATUS`  | Status: `online`, `idle`, or `dnd`          | No (default: `online`) |
-| `DISCORD_SERVERS` | Comma-separated `guild_id:channel_id` pairs | Yes                    |
+| Variable          | Description                                          | Required               |
+| ----------------- | ---------------------------------------------------- | ---------------------- |
+| `DISCORD_TOKEN`   | Your Discord user token                              | Yes                    |
+| `DISCORD_STATUS`  | Status: `online`, `idle`, or `dnd`                   | No (default: `online`) |
+| `DISCORD_SERVERS` | Comma-separated `guild_id:channel_id` pairs (max 15) | Yes                    |
 
 **Example:**
 
