@@ -4,13 +4,15 @@ import sys
 import websockets  # pyright: ignore[reportMissingImports]
 
 from src.client import get_user, keep_online
-from src.config import get_status, get_token
+from src.config import get_channel_id, get_guild_id, get_status, get_token
 from src.logger import log
 
 
 async def main() -> None:
     token = get_token()
     status = get_status()
+    guild_id = get_guild_id()
+    channel_id = get_channel_id()
 
     user = await get_user(token)
     if not user:
@@ -22,7 +24,7 @@ async def main() -> None:
 
     while True:
         try:
-            await keep_online(token, status)
+            await keep_online(token, status, guild_id, channel_id)
         except websockets.ConnectionClosed:
             log("warn", "Connection closed, reconnecting in 5s...")
             await asyncio.sleep(5)

@@ -27,3 +27,19 @@ def get_status() -> Status:
         log("error", "DISCORD_STATUS must be one of: online, idle, dnd")
         sys.exit(1)
     return status
+
+
+def get_guild_id() -> str:
+    guild_id = os.getenv("DISCORD_GUILD_ID")
+    if not guild_id:
+        log("error", "DISCORD_GUILD_ID environment variable not set")
+        sys.exit(1)
+    return guild_id
+
+
+def get_channel_id() -> str:
+    channel_id = os.getenv("DISCORD_CHANNEL_ID")
+    if not channel_id:
+        log("error", "DISCORD_CHANNEL_ID environment variable not set")
+        sys.exit(1)
+    return channel_id

@@ -20,13 +20,19 @@ async def get_user(token: str) -> User | None:
         return None
 
 
-async def keep_online(token: str, status: Status) -> None:
+async def keep_online(
+    token: str,
+    status: Status,
+    guild_id: str,
+    channel_id: str,
+) -> None:
     async with websockets.connect(GATEWAY_URL) as ws:
         hello = json.loads(await ws.recv())
         heartbeat_interval: float = hello["d"]["heartbeat_interval"] / 1000
 
         log("info", f"Connected to Gateway (heartbeat: {heartbeat_interval:.1f}s)")
 
+        # Send identify packet (online status)
         identify = {
             "op": 2,
             "d": {
@@ -45,6 +51,20 @@ async def keep_online(token: str, status: Status) -> None:
             },
         }
         await ws.send(json.dumps(identify))
+        await ws.recv()
+
+        # Join voice channel
+        voice_state = {
+            "op": 4,
+            "d": {
+                "guild_id": guild_id,
+                "channel_id": channel_id,
+                "self_mute": True,
+                "self_deaf": True,
+            },
+        }
+        await ws.send(json.dumps(voice_state))
+        log("info", f"Joined voice channel {channel_id} in guild {guild_id}")
 
         while True:
             await ws.send(json.dumps({"op": 1, "d": None}))

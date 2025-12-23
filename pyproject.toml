@@ -1,7 +1,7 @@
 [project]
 name = "keep-streak"
 version = "0.1.0"
-description = "Add your description here"
+description = "Keep your Discord activity streak alive by maintaining online presence"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
