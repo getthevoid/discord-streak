@@ -1,0 +1,6 @@
+services:
+  discord-streak:
+    build: .
+    restart: always
+    env_file:
+      - .env
