@@ -3,7 +3,7 @@
 # Default target
 help:
 	@echo "Available commands:"
-	@echo "  make install    - Install dependencies"
+	@echo "  make install    - Install dependencies and git hooks"
 	@echo "  make dev        - Run the application"
 	@echo "  make format     - Format code with ruff"
 	@echo "  make lint       - Lint code with ruff"
@@ -11,9 +11,10 @@ help:
 	@echo "  make check      - Run all checks (format, lint, typecheck)"
 	@echo "  make clean      - Remove cache files"
 
-# Install dependencies
+# Install dependencies and git hooks
 install:
 	uv sync
+	uv run lefthook install
 
 # Run the application
 dev:

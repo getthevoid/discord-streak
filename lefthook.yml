@@ -1,0 +1,16 @@
+pre-commit:
+  parallel: true
+  jobs:
+    - name: format
+      glob: "*.py"
+      run: uv run ruff format --check {staged_files}
+
+    - name: lint
+      glob: "*.py"
+      run: uv run ruff check {staged_files}
+
+    - name: typecheck
+      run: uv run pyright
+
+    - name: version-bump
+      run: ./scripts/check-version-bump.sh
