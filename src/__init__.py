@@ -1,3 +1,10 @@
 """Keep your Discord activity streak alive by maintaining online presence."""
 
-__version__ = "0.1.0"
+__metadata__ = {
+    "name": "discord-streak",
+    "version": "1.0.0",
+    "author": "getthevoid",
+    "license": "MIT",
+    "python": ">=3.12",
+    "repository": "github.com/getthevoid/discord-streak",
+}

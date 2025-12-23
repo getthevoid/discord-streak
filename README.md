@@ -101,6 +101,19 @@ make check      # Run all checks
 make clean      # Remove cache files
 ```
 
+## Metadata
+
+```python
+__metadata__ = {
+    "name": "discord-streak",
+    "version": "1.0.0",
+    "author": "getthevoid",
+    "license": "MIT",
+    "python": ">=3.12",
+    "repository": "github.com/getthevoid/discord-streak",
+}
+```
+
 ## Disclaimer
 
 This tool uses a user token which is against Discord's Terms of Service. Use at your own risk.
