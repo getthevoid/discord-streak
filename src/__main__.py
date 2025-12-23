@@ -4,7 +4,7 @@ import sys
 
 import websockets  # pyright: ignore[reportMissingImports]
 
-from src.client import get_user, keep_online
+from src.client import get_user, keep_server_online
 from src.config import get_servers, get_status, get_token
 from src.logger import log
 from src.server import start_server
@@ -23,11 +23,13 @@ def calculate_backoff(attempt: int) -> float:
     return delay + jitter
 
 
-async def discord_client(
+async def server_client(
     token: str,
     status: Status,
-    servers: list[Server],
+    server: Server,
+    client_index: int,
 ) -> None:
+    """Manage connection for a single server with reconnection."""
     session = SessionState()
     attempt = 0
 
@@ -35,7 +37,7 @@ async def discord_client(
         session.connected = False
 
         try:
-            await keep_online(token, status, servers, session)
+            await keep_server_online(token, status, server, session, client_index)
         except (
             websockets.ConnectionClosed,
             websockets.WebSocketException,
@@ -47,8 +49,12 @@ async def discord_client(
 
             delay = calculate_backoff(attempt)
             error_msg = str(e) or type(e).__name__
-            log("warn", f"Connection error: {error_msg}")
-            log("info", f"Reconnecting in {delay:.1f}s (attempt {attempt + 1})...")
+            log("warn", f"[Server {client_index + 1}] Connection error: {error_msg}")
+            log(
+                "info",
+                f"[Server {client_index + 1}] Reconnecting in {delay:.1f}s "
+                f"(attempt {attempt + 1})...",
+            )
             await asyncio.sleep(delay)
             attempt += 1
 
@@ -67,10 +73,12 @@ async def main() -> None:
     log("info", f"Status: {status}")
     log("info", f"Servers: {len(servers)}")
 
-    await asyncio.gather(
-        start_server(),
-        discord_client(token, status, servers),
-    )
+    # Create a separate connection for each server
+    tasks = [start_server()]
+    for i, server in enumerate(servers):
+        tasks.append(server_client(token, status, server, i))
+
+    await asyncio.gather(*tasks)
 
 
 if __name__ == "__main__":

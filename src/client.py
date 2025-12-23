@@ -16,6 +16,18 @@ ACTIVITY_STATE = "24/7 Online"
 REPO_URL = "https://github.com/getthevoid/discord-streak"
 
 
+def generate_client_properties(index: int) -> dict[str, str]:
+    """Generate unique client properties for each connection (15 unique combos)."""
+    os_list = ["Windows", "Linux", "Mac OS X"]
+    browser_list = ["Discord Client", "Chrome", "Firefox", "Safari", "Edge"]
+
+    # All combinations: 3 OS × 5 browsers = 15 unique
+    os_name = os_list[index % len(os_list)]
+    browser = browser_list[index // len(os_list) % len(browser_list)]
+
+    return {"os": os_name, "browser": browser, "device": ""}
+
+
 async def get_user(token: str) -> User | None:
     async with httpx.AsyncClient() as client:
         resp = await client.get(
@@ -27,28 +39,32 @@ async def get_user(token: str) -> User | None:
         return None
 
 
-async def keep_online(
+async def keep_server_online(
     token: str,
     status: Status,
-    servers: list[Server],
+    server: Server,
     session: SessionState,
+    client_index: int,
 ) -> None:
+    """Maintain connection for a single server."""
+    properties = generate_client_properties(client_index)
+
     async with websockets.connect(GATEWAY_URL) as ws:
         hello = json.loads(await ws.recv())
         heartbeat_interval: float = hello["d"]["heartbeat_interval"] / 1000
 
-        log("info", f"Connected to Gateway (heartbeat: {heartbeat_interval:.1f}s)")
+        log(
+            "info",
+            f"[Server {client_index + 1}] Connected to Gateway "
+            f"(heartbeat: {heartbeat_interval:.1f}s)",
+        )
 
-        # Send identify packet
+        # Send identify packet with unique properties
         identify = {
             "op": 2,
             "d": {
                 "token": token,
-                "properties": {
-                    "os": "Windows",
-                    "browser": "Chrome",
-                    "device": "",
-                },
+                "properties": properties,
                 "presence": {
                     "status": status,
                     "since": 0,
@@ -73,22 +89,22 @@ async def keep_online(
         # Mark as connected (for backoff reset)
         session.connected = True
 
-        # Join voice channels
-        for server in servers:
-            voice_state = {
-                "op": 4,
-                "d": {
-                    "guild_id": server.guild_id,
-                    "channel_id": server.channel_id,
-                    "self_mute": True,
-                    "self_deaf": True,
-                },
-            }
-            await ws.send(json.dumps(voice_state))
-            log(
-                "info",
-                f"Joined voice channel {server.channel_id} in guild {server.guild_id}",
-            )
+        # Join voice channel
+        voice_state = {
+            "op": 4,
+            "d": {
+                "guild_id": server.guild_id,
+                "channel_id": server.channel_id,
+                "self_mute": True,
+                "self_deaf": True,
+            },
+        }
+        await ws.send(json.dumps(voice_state))
+        log(
+            "info",
+            f"[Server {client_index + 1}] Joined voice channel "
+            f"{server.channel_id} in guild {server.guild_id}",
+        )
 
         # Simple heartbeat loop
         while True:
