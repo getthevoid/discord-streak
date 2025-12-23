@@ -51,7 +51,7 @@ Discord tracks activity streaks - consecutive days of messaging in servers. This
 
 1. Create a new **Web Service** on [Render](https://render.com)
 2. Connect your GitHub repository
-3. Set build command: `pip install uv && uv sync --frozen --no-dev`
+3. Set build command: `uv sync --frozen && uv cache prune --ci`
 4. Set start command: `uv run python -m src`
 5. Add environment variables
 6. Deploy
