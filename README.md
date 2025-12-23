@@ -44,7 +44,18 @@ Discord tracks activity streaks - consecutive days of messaging in servers. This
 | `DISCORD_GUILD_ID`   | Server ID to join voice channel       | Required |
 | `DISCORD_CHANNEL_ID` | Voice channel ID to join              | Required |
 
-## Docker Deployment
+## Deployment
+
+### Railway (Recommended)
+
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/template/getthevoid/discord-streak)
+
+1. Click the button above or create a new project on [Railway](https://railway.app)
+2. Connect your GitHub repository
+3. Add environment variables in Railway dashboard
+4. Deploy
+
+### Docker
 
 Run 24/7 with Docker:
 
