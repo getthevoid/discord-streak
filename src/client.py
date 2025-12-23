@@ -8,6 +8,13 @@ from src.config import API_URL, GATEWAY_URL
 from src.logger import log
 from src.types import Status, User
 
+# Activity
+APP_ID = "1425827351261872219"
+ACTIVITY_NAME = "The Void - Discord Activity Streak"
+ACTIVITY_DETAILS = "Keep your Discord activity streak alive for 24/7"
+ACTIVITY_STATE = "24/7 Online"
+REPO_URL = "https://github.com/pyyupsk/keep-streak"
+
 
 async def get_user(token: str) -> User | None:
     async with httpx.AsyncClient() as client:
@@ -45,7 +52,17 @@ async def keep_online(
                 "presence": {
                     "status": status,
                     "since": 0,
-                    "activities": list[dict[str, object]](),
+                    "activities": [
+                        {
+                            "name": ACTIVITY_NAME,
+                            "type": 0,
+                            "application_id": APP_ID,
+                            "details": ACTIVITY_DETAILS,
+                            "state": ACTIVITY_STATE,
+                            "buttons": ["GitHub Repository"],
+                            "metadata": {"button_urls": [REPO_URL]},
+                        }
+                    ],
                     "afk": False,
                 },
             },
