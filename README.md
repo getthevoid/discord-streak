@@ -44,6 +44,24 @@ Discord tracks activity streaks - consecutive days of messaging in servers. This
 | `DISCORD_GUILD_ID`   | Server ID to join voice channel       | Required |
 | `DISCORD_CHANNEL_ID` | Voice channel ID to join              | Required |
 
+## Docker Deployment
+
+Run 24/7 with Docker:
+
+```bash
+# Copy and configure .env
+cp .env.example .env
+
+# Start container
+docker compose up -d
+
+# View logs
+docker compose logs -f
+
+# Stop container
+docker compose down
+```
+
 ## Development
 
 ```bash
