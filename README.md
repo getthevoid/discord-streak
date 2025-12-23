@@ -9,7 +9,7 @@ Discord tracks activity streaks - consecutive days of messaging in servers. This
 ## Features
 
 - Maintains online status via Discord Gateway
-- Joins voice channel to maintain activity
+- Joins multiple voice channels across servers
 - Configurable status (online, idle, dnd)
 - Auto-reconnect on connection drops
 - Built-in health server for free hosting
@@ -38,12 +38,17 @@ Discord tracks activity streaks - consecutive days of messaging in servers. This
 
 ## Configuration
 
-| Variable             | Description                           | Default  |
-| -------------------- | ------------------------------------- | -------- |
-| `DISCORD_TOKEN`      | Your Discord user token               | Required |
-| `DISCORD_STATUS`     | Status to display (online, idle, dnd) | `online` |
-| `DISCORD_GUILD_ID`   | Server ID to join voice channel       | Required |
-| `DISCORD_CHANNEL_ID` | Voice channel ID to join              | Required |
+| Variable          | Description                                      | Default  |
+| ----------------- | ------------------------------------------------ | -------- |
+| `DISCORD_TOKEN`   | Your Discord user token                          | Required |
+| `DISCORD_STATUS`  | Status to display (online, idle, dnd)            | `online` |
+| `DISCORD_SERVERS` | Servers to join (guild_id:channel_id, comma-sep) | Required |
+
+**Example:**
+
+```env
+DISCORD_SERVERS=123456789:987654321,111111111:222222222
+```
 
 ## Deployment
 

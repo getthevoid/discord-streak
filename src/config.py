@@ -5,7 +5,7 @@ from typing import Final
 from dotenv import load_dotenv  # pyright: ignore[reportMissingImports]
 
 from src.logger import log
-from src.types import Status
+from src.types import Server, Status
 
 load_dotenv()
 
@@ -29,17 +29,25 @@ def get_status() -> Status:
     return status
 
 
-def get_guild_id() -> str:
-    guild_id = os.getenv("DISCORD_GUILD_ID")
-    if not guild_id:
-        log("error", "DISCORD_GUILD_ID environment variable not set")
+def get_servers() -> list[Server]:
+    servers_str = os.getenv("DISCORD_SERVERS")
+    if not servers_str:
+        log("error", "DISCORD_SERVERS environment variable not set")
         sys.exit(1)
-    return guild_id
 
+    servers: list[Server] = []
+    for pair in servers_str.split(","):
+        pair = pair.strip()
+        if ":" not in pair:
+            log(
+                "error", f"Invalid server format: {pair} (expected guild_id:channel_id)"
+            )
+            sys.exit(1)
+        guild_id, channel_id = pair.split(":", 1)
+        servers.append(Server(guild_id.strip(), channel_id.strip()))
 
-def get_channel_id() -> str:
-    channel_id = os.getenv("DISCORD_CHANNEL_ID")
-    if not channel_id:
-        log("error", "DISCORD_CHANNEL_ID environment variable not set")
+    if not servers:
+        log("error", "No servers configured")
         sys.exit(1)
-    return channel_id
+
+    return servers
