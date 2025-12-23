@@ -1,4 +1,4 @@
-# keep-streak
+# discord-streak
 
 Keep your Discord activity streak alive by maintaining online presence.
 

@@ -1,5 +1,5 @@
 [project]
-name = "keep-streak"
+name = "discord-streak"
 version = "0.1.0"
 description = "Keep your Discord activity streak alive by maintaining online presence"
 readme = "README.md"

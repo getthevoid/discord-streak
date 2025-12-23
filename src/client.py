@@ -13,7 +13,7 @@ APP_ID = "1425827351261872219"
 ACTIVITY_NAME = "The Void - Discord Activity Streak"
 ACTIVITY_DETAILS = "Keep your Discord activity streak alive for 24/7"
 ACTIVITY_STATE = "24/7 Online"
-REPO_URL = "https://github.com/pyyupsk/keep-streak"
+REPO_URL = "https://github.com/getthevoid/discord-streak"
 
 
 async def get_user(token: str) -> User | None:
