@@ -128,6 +128,30 @@ async def _heartbeat_loop(
         await _send_heartbeat(ws, session)
 
 
+async def _handle_dispatch(
+    ws: Any,
+    event: str | None,
+    data: dict[str, Any],
+    session: SessionState,
+    servers: list[Server],
+) -> None:
+    """Handle dispatch events (op 0)."""
+    if event == "READY":
+        session.session_id = data["session_id"]
+        session.resume_gateway_url = data.get("resume_gateway_url")
+        sid = session.session_id
+        log("info", f"Session established: {sid[:8] if sid else 'unknown'}...")
+    elif event == "RESUMED":
+        log("info", "Session resumed successfully")
+    else:
+        return
+
+    # Join voice channels after READY or RESUMED
+    session.connected = True
+    for server in servers:
+        await _join_voice_channel(ws, server)
+
+
 async def _handle_message(
     ws: Any,
     data: dict[str, Any],
@@ -136,35 +160,17 @@ async def _handle_message(
 ) -> None:
     """Handle incoming Gateway messages."""
     op = data.get("op")
-    d = data.get("d")
-    t = data.get("t")
     s = data.get("s")
 
-    # Update sequence number for dispatch events
     if s is not None:
         session.sequence = s
 
-    if op == OP_DISPATCH and d is not None:
-        if t == "READY":
-            session.session_id = d["session_id"]
-            session.resume_gateway_url = d.get("resume_gateway_url")
-            session.connected = True
-            sid = session.session_id
-            log("info", f"Session established: {sid[:8] if sid else 'unknown'}...")
-
-            # Join voice channels after READY
-            for server in servers:
-                await _join_voice_channel(ws, server)
-
-        elif t == "RESUMED":
-            session.connected = True
-            log("info", "Session resumed successfully")
-            # Rejoin voice channels after resume
-            for server in servers:
-                await _join_voice_channel(ws, server)
+    if op == OP_DISPATCH:
+        d = data.get("d")
+        if d is not None:
+            await _handle_dispatch(ws, data.get("t"), d, session, servers)
 
     elif op == OP_HEARTBEAT:
-        # Discord is requesting an immediate heartbeat
         await ws.send(json.dumps({"op": OP_HEARTBEAT, "d": session.sequence}))
 
     elif op == OP_RECONNECT:
@@ -172,7 +178,7 @@ async def _handle_message(
         raise ReconnectRequested()
 
     elif op == OP_INVALID_SESSION:
-        resumable = d is True
+        resumable = data.get("d") is True
         log("warn", f"Invalid session (resumable={resumable})")
         if not resumable:
             session.reset()

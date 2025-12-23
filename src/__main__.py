@@ -21,6 +21,16 @@ BASE_DELAY = 1.0  # Initial delay in seconds
 MAX_DELAY = 60.0  # Maximum delay in seconds
 JITTER_FACTOR = 0.1  # Random jitter as percentage of delay
 
+# Exceptions that trigger reconnection
+CONNECTION_ERRORS = (
+    websockets.ConnectionClosed,
+    websockets.WebSocketException,
+    TimeoutError,
+    OSError,
+    ZombieConnectionError,
+    ReconnectRequested,
+)
+
 
 def calculate_backoff(attempt: int) -> float:
     """
@@ -32,6 +42,40 @@ def calculate_backoff(attempt: int) -> float:
     return delay + jitter
 
 
+def _extract_reconnect_exception(
+    eg: ExceptionGroup,  # type: ignore[type-arg]
+) -> InvalidSessionError | BaseException | None:
+    """Extract the first reconnectable exception from an ExceptionGroup."""
+    for exc in eg.exceptions:
+        if isinstance(exc, (InvalidSessionError, *CONNECTION_ERRORS)):
+            return exc
+    return None
+
+
+async def _handle_reconnect(
+    exc: BaseException,
+    session: SessionState,
+    attempt: int,
+) -> int:
+    """Handle reconnection logic. Returns updated attempt counter."""
+    # Reset backoff after successful connection
+    if session.connected:
+        attempt = 0
+
+    if isinstance(exc, InvalidSessionError):
+        if exc.resumable:
+            log("info", "Resumable invalid session, reconnecting...")
+            await asyncio.sleep(1)
+            return attempt
+        session.reset()
+
+    delay = calculate_backoff(attempt)
+    log("warn", f"Connection error: {exc}")
+    log("info", f"Reconnecting in {delay:.1f}s (attempt {attempt + 1})...")
+    await asyncio.sleep(delay)
+    return attempt + 1
+
+
 async def discord_client(
     token: str,
     status: Status,
@@ -41,76 +85,19 @@ async def discord_client(
     attempt = 0
 
     while True:
-        # Reset connected flag before each attempt
         session.connected = False
 
         try:
             await keep_online(token, status, servers, session)
-        except (
-            websockets.ConnectionClosed,
-            websockets.WebSocketException,
-            TimeoutError,
-            OSError,
-            ZombieConnectionError,
-            ReconnectRequested,
-        ) as e:
-            # Reset backoff after successful connection
-            if session.connected:
-                attempt = 0
-            delay = calculate_backoff(attempt)
-            log("warn", f"Connection error: {e}")
-            log("info", f"Reconnecting in {delay:.1f}s (attempt {attempt + 1})...")
-            await asyncio.sleep(delay)
-            attempt += 1
+        except CONNECTION_ERRORS as e:
+            attempt = await _handle_reconnect(e, session, attempt)
         except InvalidSessionError as e:
-            if e.resumable:
-                # Resumable invalid session - try again quickly
-                log("info", "Resumable invalid session, reconnecting...")
-                await asyncio.sleep(1)
-            else:
-                # Non-resumable - session already reset, reconnect with backoff
-                if session.connected:
-                    attempt = 0
-                delay = calculate_backoff(attempt)
-                log("info", f"Session invalidated, reconnecting in {delay:.1f}s...")
-                await asyncio.sleep(delay)
-                attempt += 1
+            attempt = await _handle_reconnect(e, session, attempt)
         except ExceptionGroup as eg:
-            # Handle TaskGroup exceptions
-            handled = False
-            for exc in eg.exceptions:
-                if isinstance(
-                    exc,
-                    (
-                        websockets.ConnectionClosed,
-                        ZombieConnectionError,
-                        ReconnectRequested,
-                    ),
-                ):
-                    if session.connected:
-                        attempt = 0
-                    delay = calculate_backoff(attempt)
-                    log("warn", f"Connection error: {exc}")
-                    log("info", f"Reconnecting in {delay:.1f}s...")
-                    await asyncio.sleep(delay)
-                    attempt += 1
-                    handled = True
-                    break
-                elif isinstance(exc, InvalidSessionError):
-                    if not exc.resumable:
-                        session.reset()
-                    if session.connected:
-                        attempt = 0
-                    delay = 1 if exc.resumable else calculate_backoff(attempt)
-                    log("info", f"Session issue, reconnecting in {delay:.1f}s...")
-                    await asyncio.sleep(delay)
-                    if not exc.resumable:
-                        attempt += 1
-                    handled = True
-                    break
-            if not handled:
-                # Unknown exception in group, re-raise
+            exc = _extract_reconnect_exception(eg)
+            if exc is None:
                 raise
+            attempt = await _handle_reconnect(exc, session, attempt)
 
 
 async def main() -> None:
