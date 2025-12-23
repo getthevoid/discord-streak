@@ -58,7 +58,6 @@ async def _handle_reconnect(
     attempt: int,
 ) -> int:
     """Handle reconnection logic. Returns updated attempt counter."""
-    # Reset backoff after successful connection
     if session.connected:
         attempt = 0
 
@@ -70,7 +69,8 @@ async def _handle_reconnect(
         session.reset()
 
     delay = calculate_backoff(attempt)
-    log("warn", f"Connection error: {exc}")
+    error_msg = str(exc) or type(exc).__name__
+    log("warn", f"Connection error: {error_msg}")
     log("info", f"Reconnecting in {delay:.1f}s (attempt {attempt + 1})...")
     await asyncio.sleep(delay)
     return attempt + 1

@@ -14,6 +14,7 @@ class SessionState:
     resume_gateway_url: str | None = None
     last_heartbeat_acked: bool = field(default=True)
     connected: bool = field(default=False)
+    last_voice_join: float = field(default=0.0)
 
     def can_resume(self) -> bool:
         """Check if we have enough state to attempt a resume."""

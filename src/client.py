@@ -1,5 +1,6 @@
 import asyncio
 import json
+import time
 from typing import Any
 
 import httpx  # pyright: ignore[reportMissingImports]
@@ -139,17 +140,20 @@ async def _handle_dispatch(
     if event == "READY":
         session.session_id = data["session_id"]
         session.resume_gateway_url = data.get("resume_gateway_url")
+        session.connected = True
         sid = session.session_id
         log("info", f"Session established: {sid[:8] if sid else 'unknown'}...")
-    elif event == "RESUMED":
-        log("info", "Session resumed successfully")
-    else:
-        return
 
-    # Join voice channels after READY or RESUMED
-    session.connected = True
-    for server in servers:
-        await _join_voice_channel(ws, server)
+        # Join voice channels on READY (debounce: 60s cooldown)
+        now = time.time()
+        if now - session.last_voice_join > 60:
+            session.last_voice_join = now
+            for server in servers:
+                await _join_voice_channel(ws, server)
+
+    elif event == "RESUMED":
+        session.connected = True
+        log("info", "Session resumed successfully")
 
 
 async def _handle_message(
@@ -232,10 +236,8 @@ async def keep_online(
         servers: List of servers with voice channels to join
         session: Session state for tracking resumption data
     """
-    # Use resume gateway URL if available for faster reconnection
     gateway_url = session.resume_gateway_url or GATEWAY_URL
     if session.resume_gateway_url and "?" not in gateway_url:
-        # Append query params if using resume URL
         gateway_url += "?v=10&encoding=json"
 
     async with asyncio.timeout(CONNECT_TIMEOUT):
