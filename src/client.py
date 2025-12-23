@@ -39,7 +39,7 @@ async def keep_online(token: str, status: Status) -> None:
                 "presence": {
                     "status": status,
                     "since": 0,
-                    "activities": [],
+                    "activities": list[dict[str, object]](),
                     "afk": False,
                 },
             },
