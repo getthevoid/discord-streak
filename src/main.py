@@ -21,8 +21,8 @@ async def main() -> None:
             log("error", f"Configuration error: {field} - {error['msg']}")
         sys.exit(1)
 
-    # Validate token
-    client = DiscordClient(settings.token, settings.status, 0)
+    # Validate token (start_time=0 since we only call get_user)
+    client = DiscordClient(settings.token, settings.status, 0, 0)
     user = await client.get_user()
 
     if not user:

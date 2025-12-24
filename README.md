@@ -47,7 +47,7 @@ make dev
 ```python
 __metadata__ = {
     "name": "discord-streak",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "author": "getthevoid",
     "license": "MIT",
     "python": ">=3.12",

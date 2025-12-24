@@ -3,6 +3,7 @@
 import asyncio
 import json
 import random
+import time
 from http import HTTPStatus
 from typing import Final
 
@@ -48,11 +49,14 @@ def calculate_backoff(attempt: int) -> float:
 class DiscordClient:
     """Discord Gateway WebSocket client."""
 
-    def __init__(self, token: str, status: Status, client_index: int) -> None:
+    def __init__(
+        self, token: str, status: Status, client_index: int, start_time: int
+    ) -> None:
         self.token = token
         self.status = status
         self.client_index = client_index
         self.properties = generate_client_properties(client_index)
+        self.start_time = start_time
 
     async def get_user(self) -> User | None:
         """Validate token and get user information."""
@@ -93,6 +97,7 @@ class DiscordClient:
                                 "application_id": APP_ID,
                                 "details": ACTIVITY_DETAILS,
                                 "state": ACTIVITY_STATE,
+                                "timestamps": {"start": self.start_time},
                                 "buttons": ["GitHub Repository"],
                                 "metadata": {"button_urls": [REPO_URL]},
                             }
@@ -172,10 +177,11 @@ async def run_server_client(
     status: Status,
     server: Server,
     client_index: int,
+    start_time: int,
 ) -> None:
     """Manage connection for a single server with reconnection."""
     session = SessionState()
-    client = DiscordClient(token, status, client_index)
+    client = DiscordClient(token, status, client_index, start_time)
     attempt = 0
 
     while True:
@@ -207,13 +213,16 @@ async def run_server_client(
 
 async def run_all(settings: Settings) -> None:
     """Run all server connections and health server."""
+    # Capture start time once for consistent activity timestamps
+    start_time = int(time.time() * 1000)
+
     # Create a separate connection for each server
     health_server = HealthServer()
     tasks: list[asyncio.Task[None]] = [asyncio.create_task(health_server.start())]
 
     for i, server in enumerate(settings.servers):
         task = asyncio.create_task(
-            run_server_client(settings.token, settings.status, server, i)
+            run_server_client(settings.token, settings.status, server, i, start_time)
         )
         tasks.append(task)
 

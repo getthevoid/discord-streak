@@ -48,16 +48,21 @@ class TestDiscordClient:
 
     def test_client_initialization(self) -> None:
         """Test client initialization."""
-        client = DiscordClient(token="test_token", status="online", client_index=0)
+        client = DiscordClient(
+            token="test_token", status="online", client_index=0, start_time=0
+        )
         assert client.token == "test_token"
         assert client.status == "online"
         assert client.client_index == 0
+        assert client.start_time == 0
         assert "os" in client.properties
         assert "browser" in client.properties
 
     async def test_get_user_success(self) -> None:
         """Test successful user fetch."""
-        client = DiscordClient(token="test_token", status="online", client_index=0)
+        client = DiscordClient(
+            token="test_token", status="online", client_index=0, start_time=0
+        )
 
         with patch("src.engine.runner.httpx.AsyncClient") as mock_client:
             mock_instance = AsyncMock()
@@ -75,7 +80,9 @@ class TestDiscordClient:
 
     async def test_get_user_failure(self) -> None:
         """Test failed user fetch (invalid token)."""
-        client = DiscordClient(token="invalid_token", status="online", client_index=0)
+        client = DiscordClient(
+            token="invalid_token", status="online", client_index=0, start_time=0
+        )
 
         with patch("src.engine.runner.httpx.AsyncClient") as mock_client:
             mock_instance = AsyncMock()
