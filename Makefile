@@ -1,4 +1,4 @@
-.PHONY: install dev format lint typecheck check clean help
+.PHONY: install dev format lint typecheck check test clean help
 
 # Default target
 help:
@@ -9,6 +9,7 @@ help:
 	@echo "  make lint       - Lint code with ruff"
 	@echo "  make typecheck  - Type check with pyright"
 	@echo "  make check      - Run all checks (format, lint, typecheck)"
+	@echo "  make test       - Run tests with pytest"
 	@echo "  make clean      - Remove cache files"
 
 # Install dependencies and git hooks
@@ -34,6 +35,10 @@ typecheck:
 
 # Run all checks
 check: format lint typecheck
+
+# Run tests
+test:
+	uv run pytest -v
 
 # Clean cache files
 clean:

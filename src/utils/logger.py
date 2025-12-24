@@ -1,10 +1,13 @@
+"""Colored logging utility."""
+
 from datetime import datetime
+from typing import Literal
 
-from colorama import Fore, Style, init  # pyright: ignore[reportMissingModuleSource]
-
-from src.types import LogLevel
+from colorama import Fore, Style, init
 
 init()
+
+LogLevel = Literal["info", "warn", "error"]
 
 LEVEL_COLORS: dict[LogLevel, str] = {
     "info": Fore.CYAN,
@@ -14,6 +17,7 @@ LEVEL_COLORS: dict[LogLevel, str] = {
 
 
 def log(level: LogLevel, message: str) -> None:
+    """Log a message with colored level indicator."""
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     color = LEVEL_COLORS.get(level, Fore.WHITE)
     print(
