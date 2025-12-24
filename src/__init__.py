@@ -2,7 +2,7 @@
 
 __metadata__ = {
     "name": "discord-streak",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "author": "getthevoid",
     "license": "MIT",
     "python": ">=3.12",

@@ -10,15 +10,17 @@ from typing import Final
 import httpx
 import websockets  # pyright: ignore[reportMissingImports]
 
+from src import __metadata__
 from src.models.config import API_URL, GATEWAY_URL, Server, Settings, Status
 from src.models.results import SessionState, User
 from src.utils.logger import log
 
 # Activity configuration
 APP_ID: Final[str] = "1425827351261872219"
-ACTIVITY_NAME: Final[str] = "The Void - Discord Activity Streak"
-ACTIVITY_DETAILS: Final[str] = "Keep your Discord activity streak alive for 24/7"
-ACTIVITY_STATE: Final[str] = "24/7 Online"
+VERSION: Final[str] = __metadata__["version"]
+ACTIVITY_NAME: Final[str] = f"discord-streak v{VERSION}"
+ACTIVITY_DETAILS: Final[str] = "🔥 Keeping the streak alive"
+ACTIVITY_STATE: Final[str] = "⚡ 24/7 Online"
 REPO_URL: Final[str] = "https://github.com/getthevoid/discord-streak"
 
 # Reconnection settings
