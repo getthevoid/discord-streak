@@ -36,19 +36,29 @@ make dev
 | `make lint`      | Lint code with ruff                        |
 | `make typecheck` | Type check with pyright                    |
 | `make check`     | Run all checks (format + lint + typecheck) |
+| `make test`      | Run tests with pytest                      |
 | `make clean`     | Remove cache files                         |
 
 ## Project Structure
 
-```filestree
+```
 src/
-├── __init__.py      # Package metadata
-├── __main__.py      # Entry point, reconnection logic
-├── client.py        # Discord Gateway client
-├── config.py        # Environment configuration
-├── logger.py        # Logging utilities
-├── server.py        # Health check server
-└── types.py         # Type definitions
+├── __init__.py          # Package metadata
+├── __main__.py          # Package entry point
+├── main.py              # Application bootstrap
+├── engine/
+│   └── runner.py        # Discord client and health server
+├── models/
+│   ├── config.py        # Pydantic settings and server config
+│   └── results.py       # Connection state and result models
+└── utils/
+    ├── errors.py        # Custom exceptions
+    └── logger.py        # Colored logging utility
+
+tests/
+├── conftest.py          # Shared fixtures
+├── unit/                # Unit tests
+└── integration/         # Integration tests
 ```
 
 ## Code Quality
