@@ -7,8 +7,8 @@ Deploy discord-streak to run 24/7 on various platforms.
 1. Create a new **Web Service** on [Render](https://render.com)
 2. Connect your GitHub repository
 3. Configure the service:
-   - **Build Command:** `uv sync --frozen && uv cache prune --ci`
-   - **Start Command:** `uv run python -m src`
+   - **Build Command:** `uv sync --frozen --no-dev --compile-bytecode && uv cache prune --ci`
+   - **Start Command:** `uv run --no-dev python -m src`
 4. Add environment variables in the dashboard
 5. Configure **Build Filters** (optional):
    - **Included Paths:** `src/**`, `pyproject.toml`, `uv.lock`
